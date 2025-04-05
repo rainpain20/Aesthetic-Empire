@@ -1,0 +1,113 @@
+package com.aestheticempire;
+
+import com.google.gson.Gson;
+import java.io.*;
+import java.util.*;
+
+public class App {
+    private InventoryManager inventoryManager;
+    private SalesManager salesManager;
+    private Scanner scanner;
+
+    public static void main(String[] args) {
+        new App().run();
+    }
+
+    public void run() {
+        inventoryManager = new InventoryManager();
+        salesManager = new SalesManager();
+        scanner = new Scanner(System.in);
+
+        while (true) {
+            System.out.println("\n=== Aesthetic Empire ===");
+            System.out.println("1. View Inventory");
+            System.out.println("2. Add Product");
+            System.out.println("3. Delete Product");
+            System.out.println("4. Buy Product");
+            System.out.println("5. View Sales");
+            System.out.println("6. Exit");
+            System.out.print("Choose an option: ");
+            
+            int choice = scanner.nextInt();
+            scanner.nextLine();
+
+            switch (choice) {
+                case 1 -> showInventory();
+                case 2 -> addProduct();
+                case 3 -> deleteProduct();
+                case 4 -> buyProduct();
+                case 5 -> showSales();
+                case 6 -> { 
+                    System.out.println("Exiting..."); 
+                    System.exit(0);
+                }
+                default -> System.out.println("Invalid option.");
+            }
+        }
+    }
+
+    private void showInventory() {
+        System.out.println("\n--- Inventory ---");
+        inventoryManager.getProducts().forEach(p -> System.out.println(
+            "ID: " + p.getId() + 
+            " | Name: " + p.getName() + 
+            " | Price: $" + p.getPrice() + 
+            " | Seller: " + p.getSeller() + 
+            " | Added: " + p.getDateAdded()
+        ));
+    }
+
+    private void addProduct() {
+        System.out.print("Product Name: ");
+        String name = scanner.nextLine();
+        System.out.print("Price: $");
+        double price = scanner.nextDouble();
+        scanner.nextLine();
+        System.out.print("Seller: ");
+        String seller = scanner.nextLine();
+        System.out.print("Category: ");
+        String category = scanner.nextLine();
+
+        String id = "P-" + UUID.randomUUID().toString().substring(0, 8);
+        Product product = new Product(id, name, price, seller, category);
+        inventoryManager.addProduct(product);
+        System.out.println("✅ Product added! ID: " + id);
+    }
+
+    private void deleteProduct() {
+        System.out.print("Enter Product ID: ");
+        String id = scanner.nextLine();
+        inventoryManager.deleteProduct(id);
+        System.out.println("✅ Product deleted.");
+    }
+
+    private void buyProduct() {
+        System.out.print("Enter Product ID: ");
+        String id = scanner.nextLine();
+        Product product = inventoryManager.getProducts().stream()
+            .filter(p -> p.getId().equals(id))
+            .findFirst()
+            .orElse(null);
+
+        if (product == null) {
+            System.out.println("❌ Product not found.");
+            return;
+        }
+
+        System.out.print("Buyer's Name: ");
+        String buyer = scanner.nextLine();
+
+        inventoryManager.deleteProduct(id);
+        salesManager.recordTransaction(new Transaction(id, buyer, product.getName()));
+        System.out.println("✅ Purchase successful!");
+    }
+
+    private void showSales() {
+        System.out.println("\n--- Sales ---");
+        salesManager.getTransactions().forEach(t -> System.out.println(
+            "Product: " + t.getProductName() + 
+            " | Buyer: " + t.getBuyer() + 
+            " | Date: " + t.getDateSold()
+        ));
+    }
+}

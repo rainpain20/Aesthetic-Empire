@@ -1,0 +1,29 @@
+package com.aestheticempire;
+
+import java.util.Date;
+
+public class Product {
+    private String id;
+    private String name;
+    private double price;
+    private String seller;
+    private String category;
+    private Date dateAdded;
+
+    public Product(String id, String name, double price, String seller, String category) {
+        this.id = id;
+        this.name = name;
+        this.price = price;
+        this.seller = seller;
+        this.category = category;
+        this.dateAdded = new Date();
+    }
+
+    // Getters
+    public String getId() { return id; }
+    public String getName() { return name; }
+    public double getPrice() { return price; }
+    public String getSeller() { return seller; }
+    public String getCategory() { return category; }
+    public Date getDateAdded() { return dateAdded; }
+}

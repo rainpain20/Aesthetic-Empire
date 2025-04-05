@@ -1,0 +1,43 @@
+package com.aestheticempire;
+
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import java.io.*;
+import java.util.*;
+
+public class InventoryManager {
+    private List<AestheticTShirt> tshirts;
+    private Gson gson = new Gson();
+    private static final String INVENTORY_FILE = "inventory.json"; // Simplified path
+
+    public InventoryManager() {
+        tshirts = loadInventory();
+    }
+
+    public void addTShirt(AestheticTShirt tshirt) {
+        tshirts.add(tshirt);
+        saveInventory();
+    }
+
+    private List<AestheticTShirt> loadInventory() {
+        try (Reader reader = new FileReader(INVENTORY_FILE)) {
+            return gson.fromJson(reader, new TypeToken<List<AestheticTShirt>>(){}.getType());
+        } catch (IOException e) {
+            return new ArrayList<>();
+        }
+    }
+
+    private void saveInventory() {
+        try (Writer writer = new FileWriter(INVENTORY_FILE)) {
+            gson.toJson(tshirts, writer);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public List<AestheticTShirt> getTshirts() { return tshirts; }
+    public void removeTShirt(String id) {
+        tshirts.removeIf(t -> t.getId().equals(id));
+        saveInventory();
+    }
+}

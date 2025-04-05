@@ -1,0 +1,23 @@
+package com.aestheticempire;
+
+import java.util.Date;
+
+public class Transaction {
+    private String productId;
+    private String purchaser;
+    private Date dateSold;
+    private String productName;
+
+    public Transaction(String productId, String purchaser, String productName) {
+        this.productId = productId;
+        this.purchaser = purchaser;
+        this.productName = productName;
+        this.dateSold = new Date();
+    }
+
+    // Getters
+    public String getProductId() { return productId; }
+    public String getPurchaser() { return purchaser; }
+    public Date getDateSold() { return dateSold; }
+    public String getProductName() { return productName; }
+}
