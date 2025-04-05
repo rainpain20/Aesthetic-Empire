@@ -1,0 +1,39 @@
+package com.aestheticempire;
+
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import java.io.*;
+import java.util.*;
+
+public class SalesManager {
+    private List<Transaction> transactions;
+    private Gson gson = new Gson();
+    private static final String SALES_FILE = "sales.json"; // Simplified path
+
+    public SalesManager() {
+        transactions = loadTransactions();
+    }
+
+    public void recordSale(Transaction transaction) {
+        transactions.add(transaction);
+        saveTransactions();
+    }
+
+    private List<Transaction> loadTransactions() {
+        try (Reader reader = new FileReader(SALES_FILE)) {
+            return gson.fromJson(reader, new TypeToken<List<Transaction>>(){}.getType());
+        } catch (IOException e) {
+            return new ArrayList<>();
+        }
+    }
+
+    private void saveTransactions() {
+        try (Writer writer = new FileWriter(SALES_FILE)) {
+            gson.toJson(transactions, writer);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public List<Transaction> getTransactions() { return transactions; }
+}

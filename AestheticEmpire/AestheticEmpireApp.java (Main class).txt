@@ -1,0 +1,100 @@
+package com.aestheticempire;
+
+import java.util.Scanner;
+import java.util.UUID;
+
+public class AestheticEmpireApp {
+    private InventoryManager inventoryManager;
+    private SalesManager salesManager;
+    private Scanner scanner;
+
+    public static void main(String[] args) {
+        new AestheticEmpireApp().run();
+    }
+
+    public void run() {
+        inventoryManager = new InventoryManager();
+        salesManager = new SalesManager();
+        scanner = new Scanner(System.in);
+
+        while (true) {
+            System.out.println("\n=== Aesthetic Empire ===");
+            System.out.println("1. View Inventory");
+            System.out.println("2. Add T-Shirt");
+            System.out.println("3. Buy T-Shirt");
+            System.out.println("4. View Sales");
+            System.out.println("5. Exit");
+            System.out.print("Choose an option: ");
+
+            int choice = scanner.nextInt();
+            scanner.nextLine();
+
+            switch (choice) {
+                case 1 -> showInventory();
+                case 2 -> addTShirt();
+                case 3 -> buyTShirt();
+                case 4 -> showSales();
+                case 5 -> System.exit(0);
+                default -> System.out.println("Invalid option.");
+            }
+        }
+    }
+
+    private void showInventory() {
+        System.out.println("\n--- Inventory ---");
+        inventoryManager.getTshirts().forEach(t -> System.out.println(
+            "ID: " + t.getId() +
+            " | Name: " + t.getName() +
+            " | Price: $" + t.getPrice() +
+            " | Category: " + t.getCategory() +
+            " | Date Added: " + t.getDateAdded()
+        ));
+    }
+
+    private void addTShirt() {
+        System.out.print("T-Shirt Name: ");
+        String name = scanner.nextLine();
+        System.out.print("Price: ");
+        double price = scanner.nextDouble();
+        scanner.nextLine();
+        System.out.print("Seller: ");
+        String seller = scanner.nextLine();
+        System.out.print("Category (Vintage/Y2K): ");
+        String category = scanner.nextLine();
+
+        String id = "TS-" + UUID.randomUUID().toString().substring(0, 8);
+        AestheticTShirt tshirt = new AestheticTShirt(id, name, price, seller, category);
+        inventoryManager.addTShirt(tshirt);
+        System.out.println("✅ T-Shirt added (ID: " + id + ")");
+    }
+
+    private void buyTShirt() {
+        System.out.print("T-Shirt ID: ");
+        String id = scanner.nextLine();
+        AestheticTShirt tshirt = inventoryManager.getTshirts().stream()
+            .filter(t -> t.getId().equals(id))
+            .findFirst()
+            .orElse(null);
+
+        if (tshirt == null) {
+            System.out.println("❌ T-Shirt not found.");
+            return;
+        }
+
+        System.out.print("Buyer's Name: ");
+        String purchaser = scanner.nextLine();
+
+        inventoryManager.removeTShirt(id);
+        salesManager.recordSale(new Transaction(id, purchaser, tshirt.getName()));
+        System.out.println("✅ Purchase successful!");
+    }
+
+    private void showSales() {
+        System.out.println("\n--- Sales ---");
+        salesManager.getTransactions().forEach(t -> System.out.println(
+            "Product: " + t.getProductName() +
+            " | Buyer: " + t.getPurchaser() +
+            " | Date: " + t.getDateSold()
+        ));
+    }
+}
